@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
-"""subfunctions.ipy
-
-testing commit 
-"""
+"""subfunctions.py"""
 
 # Imports
 import numpy as np
 import math
 
 # Define constants and dictionaries (given from appendix A and C)
-
 wheel = {
     'radius': 0.30, # in m
     'mass': 1.0 # in kg
@@ -32,7 +27,6 @@ motor = {
 chassis = {
     'mass': 659.0 # in kg
    }
-
 
 science_payload = {
     'mass': 75.0 # in kg
@@ -59,7 +53,7 @@ rover = {
     'power_subsys': power_subsys
     }
 
-
+#####
 
 def get_mass(rover):
 
@@ -78,6 +72,7 @@ def get_mass(rover):
 
     return total_mass
 
+#####
 
 def get_gear_ratio(speed_reducer):
     """
@@ -95,11 +90,13 @@ def get_gear_ratio(speed_reducer):
 
     return Ng
 
+#####
 
 def tau_dcmotor(omega, motor):
 
-    if not (isinstance(omega, float) or isinstance(omega, np.ndarray)):
+    if not (np.isscalar(omega) or isinstance(omega, np.ndarray)):
         raise Exception("Omega must be a scalar or vector")
+        
     if not isinstance(motor, dict):
         raise Exception("Motor must be a dictionary.")
 
@@ -121,6 +118,8 @@ def tau_dcmotor(omega, motor):
         torque = np.where( omega < 0, torque_stall, np.where(omega > speed_noload, 0, torque_stall - ((torque_stall - torque_noload)/speed_noload)*omega ) )
 
     return torque
+
+#####
 
 def F_drive(omega, rover):
     """
@@ -155,6 +154,8 @@ def F_drive(omega, rover):
 
     return Fd
 
+#####
+
 def F_gravity(terrain_angle, rover, planet):
 
     if not isinstance(terrain_angle, float):
@@ -172,6 +173,8 @@ def F_gravity(terrain_angle, rover, planet):
     Fgt = mass_rover * g_mars * np.sin(np.deg2rad(terrain_angle))
 
     return Fgt
+
+#####
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     """
@@ -233,7 +236,7 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
 
     return Frr
 
-
+#####
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
 
@@ -256,7 +259,8 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
         raise Exception("Array of terrain angles must be a scalar or vector")
 
 
-  # .asarray() turns variable into type array if not already
+    # .asarray() turns variable into type array if not already
+    # turning omega and terrain_angle into arrays so we can compare size
     omega = np.asarray(omega)
     terrain_angle = np.asarray(terrain_angle)
 
@@ -268,10 +272,12 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
     if np.any(terrain_angle < -75.0) or np.any(terrain_angle > 75.0):
         raise Exception ("Terrain angle must be between -75 and +75 degrees")
+        
     if not isinstance(rover, dict):
-        raise Exception ("Rover must be a dictionary")
+        raise Exception ("Rover must be a dictionary.")
+        
     if not isinstance(planet, dict):
-        raise Exception ("planet must be a dictionary")
+        raise Exception ("Llanet must be a dictionary.")
 
     Fnet = F_drive(omega, rover) + F_gravity(terrain_angle, rover, planet) + F_rolling(omega, terrain_angle, rover, planet, Crr)
 
