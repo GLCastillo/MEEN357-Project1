@@ -173,8 +173,9 @@ def F_gravity(terrain_angle, rover, planet):
 
     g_mars = planet["g"]
     mass_rover = get_mass(rover)
-
-    Fgt = mass_rover * g_mars * np.sin(np.deg2rad(terrain_angle))
+    alpha = terrain_angle * math.pi / 180 
+    
+    Fgt = mass_rover * g_mars * np.sin(alpha)
 
     return Fgt
 
@@ -221,7 +222,7 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # Take rover velocity into account
     Ng = get_gear_ratio( rover['wheel_assembly']['speed_reducer'] )
     r = rover['wheel_assembly']['wheel']['radius']
-    v_rover = r * omega * Ng # in m/s
+    v_rover = r * omega / Ng # in m/s
 
 
     # Calculate erf for scalar or vector
