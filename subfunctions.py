@@ -236,9 +236,8 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
            erf_value[i] = math.erf(40 * v_rover[i])
 
     Frr = -erf_value * simple_Frr # negative sign to account for retarding
-
-    Frr = 6 * Frr # account for all 6 wheels
-
+    # already accounting for 6 wheels since get_mass(rover) accounts for all 6 wheels
+    
     return Frr
 
 #####
