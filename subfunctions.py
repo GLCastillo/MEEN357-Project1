@@ -175,7 +175,7 @@ def F_gravity(terrain_angle, rover, planet):
     mass_rover = get_mass(rover)
     alpha = terrain_angle * math.pi / 180 
     
-    Fgt = mass_rover * g_mars * np.sin(alpha)
+    Fgt = - mass_rover * g_mars * np.sin(alpha) # negative sign to account for rover rolling DOWN the incline
 
     return Fgt
 
@@ -284,6 +284,9 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     if not isinstance(planet, dict):
         raise Exception ("Llanet must be a dictionary.")
 
-    Fnet = F_drive(omega, rover) + F_gravity(terrain_angle, rover, planet) + F_rolling(omega, terrain_angle, rover, planet, Crr)
+    Fd = F_drive(omega, rover) 
+    Fg = F_gravity(terrain_angle, rover, planet)
+    Fr = F_rolling(omega, terrain_angle, rover, planet, Crr)
+    Fnet = Fd + Fg + Fr
 
     return Fnet
