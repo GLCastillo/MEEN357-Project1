@@ -93,8 +93,9 @@ def get_gear_ratio(speed_reducer):
 #####
 
 def tau_dcmotor(omega, motor):
-
-    if not (np.isscalar(omega) or isinstance(omega, np.ndarray)):
+    
+    # omega must be scalar or 1D array
+    if not (np.isscalar(omega) or (isinstance(omega, np.ndarray) and omega.ndim == 1)):
         raise Exception("Omega must be a scalar or vector")
         
     if not isinstance(motor, dict):
@@ -134,10 +135,10 @@ def F_drive(omega, rover):
         omega_type_check = True
 
     if omega_type_check == False:
-        raise Exception("omega must be a scalar or vector value")
+        raise Exception("Omega must be a scalar or vector value")
 
     if isinstance(rover, dict) == False:
-        raise Exception("rover must be a dictionary.")
+        raise Exception("Rover must be a dictionary.")
 
     motor = rover['wheel_assembly']['motor']
     sr = rover['wheel_assembly']['speed_reducer']
@@ -158,14 +159,17 @@ def F_drive(omega, rover):
 
 def F_gravity(terrain_angle, rover, planet):
 
-    if not isinstance(terrain_angle, float):
-        raise Exception ("Array of terrain angles must be a scalar or vector")
-    if not (-75 <= terrain_angle <= 75):
-        raise Exception ("Terrain angle must be between -75 and +75 degrees")
+    if not (np.isscalar(terrain_angle) or isinstance(terrain_angle, np.ndarray)):
+        raise Exception ("Terrain angle(s) must be a scalar or vector.")
+        
+    if np.any(terrain_angle < -75.0) or np.any(terrain_angle > 75.0):
+        raise Exception ("Terrain angle(s) must be between -75 and +75 degrees.")
+        
     if not isinstance(rover, dict):
-        raise Exception ("Rover must be a dictionary")
+        raise Exception ("Rover must be a dictionary.")
+        
     if not isinstance(planet, dict):
-        raise Exception ("planet must be a dictionary")
+        raise Exception ("Planet must be a dictionary.")
 
     g_mars = planet["g"]
     mass_rover = get_mass(rover)
@@ -188,19 +192,19 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     terrain_angle = np.asarray(terrain_angle)
 
     if omega.ndim > 1 or terrain_angle.ndim > 1:
-        raise Exception('omega and terrain_angle must be scalars or 1D arrays')
+        raise Exception('Omega and terrain_angle must be scalars or 1D arrays.')
 
     if omega.size != terrain_angle.size:
-        raise Exception('omega and terrain_angle must be the same size')
+        raise Exception('Omega and terrain_angle must be the same size.')
 
     if np.any(terrain_angle < -75.0) or np.any(terrain_angle > 75.0):
-        raise Exception ("Terrain angle must be between -75 and +75 degrees")
+        raise Exception ("Terrain angle(s) must be between -75 and +75 degrees.")
 
     if isinstance(rover, dict) == False:
-        raise Exception("rover must be a dictionary.")
+        raise Exception("Rover must be a dictionary.")
 
     if isinstance(planet, dict) == False:
-        raise Exception("planet must be a dictionary.")
+        raise Exception("Planet must be a dictionary.")
 
     if np.isscalar(Crr) == False or Crr <= 0:
         raise Exception("Crr must be a positive scalar.")
@@ -243,6 +247,7 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     omega_type_check = False
     if isinstance(omega, np.ndarray):
           omega_type_check = True
+          
     if np.isscalar(omega):
         omega_type_check = True
 
