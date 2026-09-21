@@ -14,7 +14,7 @@ for i in range(len(slope_array_deg)):
     slope = slope_array_deg[i]
     
     vlow = 0
-    vhigh = 3.80
+    vhigh = 0.372
     
     for j in range(50):
         vmid = (vhigh + vlow) / 2
