@@ -20,7 +20,7 @@ tau = tau_dcmotor(omega, motor)
 power = tau * omega
 
 # display settings
-plt.figure(figsize=(16, 20))
+plt.figure(figsize=(8, 10))
 
 # top plot: motor shaft speed [rad/s] vs. motor shaft torque [Nm] (use torque on the x-axis)
 
