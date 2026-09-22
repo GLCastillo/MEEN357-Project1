@@ -27,7 +27,7 @@ tau_out = Ng * tau_in
 power_out = tau_out * omega_out
 
 # display settings
-plt.figure(figsize=(16, 20))
+plt.figure(figsize=(8, 10))
 
 # top plot: motor shaft speed [rad/s] vs. motor shaft torque [Nm] (use torque on the x-axis)
 
