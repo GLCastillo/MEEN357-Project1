@@ -294,7 +294,7 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     return Fnet
 
 
-######
+### Computes the rotational speed of the motor shaft
 def motorW(v, rover):
     
     v_type_check = False
@@ -371,11 +371,30 @@ def rover_dynamics(t, y, rover, planet, experiment):
     return dydt
 
 
-#### mechpower computes the instantaneous mechanical power output
+### Computes the instantaneous mechanical power output
 def mechpower(v, rover):
+    
+    # Validate that v is a scalar or a 1D numpy array
+    if v > 1:
+        raise Exception('v must be a scalar or a 1D array.')
+    
+    # Validate that v contains numerical values
+    if not np.issubdtype(np.asarray(v).dtype, np.number):
+        raise Exception("v must contain numerical values")
     
     # Validate that rover is a dictionary
     if not isinstance(rover, dict):
         raise Exception ("Rover must be a dictionary.")
+    
+    # Calculate motor angular velocity
+    omega = motorW(v, rover)
+    
+    # Calculate the motor torque
+    tau = tau_dcmotor(omega, rover)
+    
+    # Calculate the mechanical power
+    Power = tau * omega
+    
+    return Power
     
  
