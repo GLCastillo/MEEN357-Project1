@@ -3,6 +3,8 @@
 # Imports
 import numpy as np
 import math
+from define_experiment import experiment1
+from scipy.interpolate import interp1d
 
 # Define constants and dictionaries (given from appendix A and C)
 wheel = {
@@ -290,3 +292,90 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     Fnet = Fd + Fg + Fr
 
     return Fnet
+
+
+######
+def motorW(v, rover):
+    
+    v_type_check = False
+    
+    # Validate that v is a scalar or vector, i'm missing one check
+    if v_type_check == False:
+        raise Exception("omega must be a scalar or vector value")
+    
+    # Validate that w is a dictionary
+    if not isinstance(rover, dict):
+        raise Exception ("rover must be a dictionary.")
+        
+        
+    # rotational speed of motor = (rover velocity/wheel radius)*gear ratio
+    
+    r = rover["wheel_assembly"]["radius"]
+    G = get_gear_ratio(speed_reducer)
+    
+    # calculate the motor angular velocity
+    w = (v/r)*G
+    
+    return w
+
+
+###  rover_dynamics to compute the derivative of the state vector
+def rover_dynamics(t, y, rover, planet, experiment):
+    
+    # Validate that t is a scalar
+    if not np.isscalar(t):
+        raise Exception("t must be a scalar")
+    
+    # Validate that y is a 1D numpy array
+    if y > 1:
+        raise Exception('Y must be a scalar or a 1D array.')
+    
+    # Validate that rover is a dictionary
+    if not isinstance(rover, dict):
+        raise Exception ("Rover must be a dictionary.")
+    
+    # Validate that planet is a dictionary
+    if not isinstance(planet, dict):
+        raise Exception ("Planet must be a dictionary.")
+        
+    # Validate that experiment is a dictionary
+    if not isinstance(experiment, dict):
+        raise Exception ("Experiment must be a dictionary.")
+    
+ 
+    # Caclualate terrain angle after creating interpolation function        
+    alpha_dist = experiment['alpha_dist']
+    alpha_deg = experiment['alpha_deg']
+        
+    alpha_fun = interp1d(alpha_dist, alpha_deg, kind = 'cubic', fill_value='extrapolate')
+    terrain_angle = alpha_fun(y[1])
+    
+    # Rover velocity
+    velocity = y[0]
+    
+    # Calculate motor angular velocity
+    omega = motorW(velocity, rover)
+    
+    # Calculate net force
+    Fnet = F_net(omega, terrain_angle, rover, planet, experiment['Crr'])
+    
+    # Calculate total rover mass
+    mass = get_mass(rover)
+    
+    # Caclulate acceleration
+    acceleration = Fnet/mass
+    
+    #Return derivetives
+    dydt = np.array([acceleration, velocity])
+    
+    return dydt
+
+
+#### mechpower computes the instantaneous mechanical power output
+def mechpower(v, rover):
+    
+    # Validate that rover is a dictionary
+    if not isinstance(rover, dict):
+        raise Exception ("Rover must be a dictionary.")
+    
+ 
