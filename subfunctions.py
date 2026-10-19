@@ -6,6 +6,7 @@ import math
 from define_experiment import experiment1
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp, trapezoid
+from end_of_mission_event import end_of_mission_event
 
 # Define constants and dictionaries (given from appendix A and C)
 wheel = {
@@ -469,11 +470,12 @@ def battenergy(t, v, rover):
 
     return float(E)
 
-#####
+####
 
-# Simulate rover trajectory and telemetry data
+# Simulates the rover's trajectory and calculates its telemetry data
 def simulate_rover(rover, planet, experiment, end_event):
 
+    # Validate dictionaries
     if not isinstance(rover, dict):
         raise Exception("rover must be a dictionary.")
 
@@ -486,28 +488,19 @@ def simulate_rover(rover, planet, experiment, end_event):
     if not isinstance(end_event, dict):
         raise Exception("end_event must be a dictionary.")
 
-    # Initial conditions and time range
-    t0, tf = experiment['time_range']
-    y0 = np.asarray(experiment['initial_conditions'], dtype=float)
+    # Get initial conditions and time range
+    t_range = experiment['time_range']
+    y0 = experiment['initial_conditions']
 
-    if y0.shape != (2,):
-        raise Exception("Initial conditions must contain velocity and position.")
+    # Create events to terminate the simulation
+    events = end_of_mission_event(end_event)
 
-    # Stopping conditions
-    max_time = end_event['max_time']
-
-    # Final simulation time
-    t_final = min(tf, t0 + max_time)
-
-    # Solve differential equations
+    # Solve the rover differential equations
     sol = solve_ivp(
-        rover_dynamics,
-        (t0, t_final),
+        lambda t, y: rover_dynamics(t, y, rover, planet, experiment),
+        t_range,
         y0,
-        args=(rover, planet, experiment),
-        rtol=1e-6,
-        atol=1e-8,
-        max_step=1.0
+        events=events
     )
 
     if not sol.success:
@@ -515,8 +508,8 @@ def simulate_rover(rover, planet, experiment, end_event):
 
     # Get time, velocity, and position
     t = sol.t
-    v = sol.y[0, :]
-    x = sol.y[1, :]
+    v = sol.y[0]
+    x = sol.y[1]
 
     # Calculate mechanical power
     P = mechpower(v, rover)
@@ -524,13 +517,13 @@ def simulate_rover(rover, planet, experiment, end_event):
     # Calculate battery energy
     E = battenergy(t, v, rover)
 
-    # Calculate distance traveled
+    # Calculate total distance traveled
     distance = x[-1] - x[0]
 
     # Calculate completion time
     completion_time = t[-1] - t[0]
 
-    # Fill telemetry dictionary
+    # telemetry dictionary
     rover['telemetry'] = {
         'Time': t,
         'completion_time': completion_time,
@@ -545,4 +538,5 @@ def simulate_rover(rover, planet, experiment, end_event):
     }
 
     return rover
+
  
