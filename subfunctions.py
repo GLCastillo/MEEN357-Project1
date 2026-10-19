@@ -300,21 +300,19 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 # Computes the rotational speed of the motor shaft
 def motorW(v, rover):
     
-    v_type_check = False
     
     # Validate that v is a scalar or vector, i'm missing one check
-    if v_type_check == False:
+    if not (np.isscalar(v) or isinstance(v, np.ndarray)):
         raise Exception("omega must be a scalar or vector value")
     
     # Validate that w is a dictionary
     if not isinstance(rover, dict):
         raise Exception ("rover must be a dictionary.")
         
-        
     # rotational speed of motor = (rover velocity/wheel radius)*gear ratio
     
-    r = rover["wheel_assembly"]["radius"]
-    G = get_gear_ratio(speed_reducer)
+    r = rover["wheel_assembly"]["wheel"]["radius"]
+    G = get_gear_ratio(rover["wheel_assembly"]["speed_reducer"])
     
     # calculate the motor angular velocity
     w = (v/r)*G
@@ -331,7 +329,7 @@ def rover_dynamics(t, y, rover, planet, experiment):
         raise Exception("t must be a scalar")
     
     # Validate that y is a 1D numpy array
-    if y > 1:
+    if not isinstance(y, np.darray) or y.ndim !=1 or len(y) != 2:
         raise Exception('Y must be a scalar or a 1D array.')
     
     # Validate that rover is a dictionary
@@ -380,7 +378,7 @@ def rover_dynamics(t, y, rover, planet, experiment):
 def mechpower(v, rover):
     
     # Validate that v is a scalar or a 1D numpy array
-    if v > 1:
+    if not (np.isscalar(v) or (isinstance(v, np.ndarray) and v.ndim == 1)):
         raise Exception('v must be a scalar or a 1D array.')
     
     # Validate that v contains numerical values
@@ -395,7 +393,7 @@ def mechpower(v, rover):
     omega = motorW(v, rover)
     
     # Calculate the motor torque
-    tau = tau_dcmotor(omega, rover)
+    tau = tau_dcmotor(omega, rover["wheel_assembly"]["motor"])
     
     # Calculate the mechanical power
     Power = tau * omega
