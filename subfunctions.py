@@ -297,36 +297,24 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
 #####
 
+# Computes the rotational speed of the motor shaft
 def motorW(v, rover):
-    """
-    Compute the rotational speed of the motor shaft
-
-    Parameters
-    ----------
-    v: scalar or numpy.ndarray
-        rover translational velocity
-    rover: dict
-        dictionary containing the rover parameters
-
-    Returns
-    -------
-    w: scalar or numpy.ndarray
-        motor shaft rotational speed
-
-    """
     
-    # Validate that v is a scalar or vector
-    if not (np.isscalar(v) or isinstance(v, np.ndarray)):
-        raise Exception ("v must be a scalar or vector")
-        
+    v_type_check = False
+    
+    # Validate that v is a scalar or vector, i'm missing one check
+    if v_type_check == False:
+        raise Exception("omega must be a scalar or vector value")
+    
     # Validate that w is a dictionary
     if not isinstance(rover, dict):
         raise Exception ("rover must be a dictionary.")
         
+        
     # rotational speed of motor = (rover velocity/wheel radius)*gear ratio
     
-    r = rover["wheel_assembly"]["wheel"]["radius"]
-    G = get_gear_ratio(rover["wheel _assembly"]["speed_reducer"])
+    r = rover["wheel_assembly"]["radius"]
+    G = get_gear_ratio(speed_reducer)
     
     # calculate the motor angular velocity
     w = (v/r)*G
@@ -335,34 +323,15 @@ def motorW(v, rover):
 
 #####
 
+# rover_dynamics to compute the derivative of the state vector
 def rover_dynamics(t, y, rover, planet, experiment):
-
-    """
-    Compute the time derivative of the rover state vector
-
-    Parameters
-    ----------
-    t: scalar
-        time (s)
-    y: numpy.ndarray
-         state vector containing velocity and distance
-    rover: dict
-        dictionary containing rover parameters
-    planet: dict
-        dictionary containing planetary parameters
-    experiment: dict
-        dictionary containing experiment parameters
-
-    Returns
-    -------
-    dydt: numpy.ndarray
     
     # Validate that t is a scalar
     if not np.isscalar(t):
         raise Exception("t must be a scalar")
     
     # Validate that y is a 1D numpy array
-    if not isinstance(y, np.darray) or y.ndim != 1:
+    if y > 1:
         raise Exception('Y must be a scalar or a 1D array.')
     
     # Validate that rover is a dictionary
@@ -407,25 +376,11 @@ def rover_dynamics(t, y, rover, planet, experiment):
 
 #####
 
+# Computes the instantaneous mechanical power output
 def mechpower(v, rover):
-
-    """
-    Computes the instantaneous mechanical power output
-
-    Parameters
-    ----------
-    v: scalar or numpy.ndarray
-        rover translational velocity
-    rover: dict
-        Dictionary containing rover parameters
-
-    Returns
-    -------
-    Power: scalar or numpy.ndarray
-        instantaneous mechanical power [W]
     
     # Validate that v is a scalar or a 1D numpy array
-    if not (np.iscalar(v) or isinstance(v, np.ndarray) and v.ndim == 1):
+    if v > 1:
         raise Exception('v must be a scalar or a 1D array.')
     
     # Validate that v contains numerical values
@@ -583,7 +538,9 @@ def simulate_rover(rover, planet, experiment, end_event):
 
     return rover
 
-#given from Canvas
+####
+
+# given from Canvas
 def end_of_mission_event(end_event):
     """
     Defines an event that terminates the mission simulation. Mission is over
@@ -618,4 +575,6 @@ def end_of_mission_event(end_event):
     events = [distance_left, time_left, velocity_threshold]
     
     return events
+
+
 
