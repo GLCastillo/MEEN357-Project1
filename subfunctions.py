@@ -317,7 +317,8 @@ def motorW(v, rover):
     
     # Validate that v is a scalar or vector
     if not (np.isscalar(v) or isinstance(v, np.ndarray)):
-    
+        raise Exception ("v must be a scalar or vector")
+        
     # Validate that w is a dictionary
     if not isinstance(rover, dict):
         raise Exception ("rover must be a dictionary.")
