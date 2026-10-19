@@ -270,15 +270,18 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
     # .asarray() turns variable into type array if not already
     # turning omega and terrain_angle into arrays so we can compare size
-    omega = np.asarray(omega)
-    terrain_angle = np.asarray(terrain_angle)
+    if not np.isscalar(omega):
+        omega = np.asarray(omega)
 
-    if omega.ndim > 1 or terrain_angle.ndim > 1:
+    if not np.isscalar(terrain_angle):
+        terrain_angle = np.asarray(terrain_angle)
+
+    if np.ndim(omega) > 1 or np.ndim(terrain_angle) > 1:
         raise Exception('omega and terrain_angle must be scalars or 1D arrays')
 
-    if omega.size != terrain_angle.size:
+    if np.size(omega) != np.size(terrain_angle):
         raise Exception('omega and terrain_angle must be the same size')
-
+    
     if np.any(terrain_angle < -75.0) or np.any(terrain_angle > 75.0):
         raise Exception ("Terrain angle must be between -75 and +75 degrees")
         
@@ -385,7 +388,7 @@ def rover_dynamics(t, y, rover, planet, experiment):
     alpha_deg = experiment['alpha_deg']
         
     alpha_fun = interp1d(alpha_dist, alpha_deg, kind = 'cubic', fill_value='extrapolate')
-    terrain_angle = alpha_fun(y[1])
+    terrain_angle = float(alpha_fun(y[1]))
     
     # Rover velocity
     velocity = y[0]
@@ -394,7 +397,7 @@ def rover_dynamics(t, y, rover, planet, experiment):
     omega = motorW(velocity, rover)
     
     # Calculate net force
-    Fnet = F_net(omega, terrain_angle, rover, planet, experiment['Crr'])
+    Fnet = F_net(float(omega), terrain_angle, rover, planet, experiment['Crr'])
     
     # Calculate total rover mass
     mass = get_mass(rover)
