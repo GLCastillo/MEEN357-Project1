@@ -27,7 +27,7 @@ v = telemetry['velocity']
 P = telemetry['power']
 
 # display settings
-plt.figure(figsize=(8, 10))
+plt.figure(figsize=(8, 12))
 
 # top plot: rover position vs. time
 plt.subplot(3,1,1)
@@ -50,7 +50,12 @@ plt.xlabel('Time [s]')
 plt.ylabel('Motor Power [W]')
 plt.title('Motor Power vs. Time')
 
+# fix spacing in between graphs
+plt.tight_layout()
+
 plt.show()
+
+
 
 # Print telemetry results
 print('Simulation Results:')
@@ -65,7 +70,7 @@ print('Energy per Distance [J/m]:', telemetry['energy_per_distance'])
 # task 9
 
 # Battery capacity
-battery_capacity = 0.9072 * 10^6
+battery_capacity = 0.9072 * (10**6)
 
 # energy required
 battery_energy = telemetry['battery_energy']
@@ -74,7 +79,7 @@ battery_energy = telemetry['battery_energy']
 remaining_energy = battery_capacity - battery_energy
 
 # Check if the rover completed the mission
-if telemetry['distance_traveled'] >= 1000 - 1 *10^(-6):
+if telemetry['distance_traveled'] >= 1000 - 1 *(10**(-6)):
     if battery_energy <= battery_capacity:
         print("The rover can complete the mission with the battery pack.")
     else:
