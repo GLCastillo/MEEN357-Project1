@@ -6,6 +6,7 @@ import math
 from define_experiment import experiment1
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp, trapezoid
+from end_of_mission_event import end_of_mission_event
 
 # Define constants and dictionaries (given from appendix A and C)
 wheel = {
@@ -297,24 +298,35 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
 #####
 
-# Computes the rotational speed of the motor shaft
 def motorW(v, rover):
+    """
+    Compute the rotational speed of the motor shaft
+
+    Parameters
+    ----------
+    v: scalar or numpy.ndarray
+        rover translational velocity
+    rover: dict
+        dictionary containing the rover parameters
+
+    Returns
+    -------
+    w: scalar or numpy.ndarray
+        motor shaft rotational speed
+
+    """
     
-    v_type_check = False
-    
-    # Validate that v is a scalar or vector, i'm missing one check
-    if v_type_check == False:
-        raise Exception("omega must be a scalar or vector value")
+    # Validate that v is a scalar or vector
+    if not (np.isscalar(v) or isinstance(v, np.ndarray)):
     
     # Validate that w is a dictionary
     if not isinstance(rover, dict):
         raise Exception ("rover must be a dictionary.")
         
-        
     # rotational speed of motor = (rover velocity/wheel radius)*gear ratio
     
-    r = rover["wheel_assembly"]["radius"]
-    G = get_gear_ratio(speed_reducer)
+    r = rover["wheel_assembly"]["wheel"]["radius"]
+    G = get_gear_ratio(rover["wheel _assembly"]["speed_reducer"])
     
     # calculate the motor angular velocity
     w = (v/r)*G
@@ -323,15 +335,34 @@ def motorW(v, rover):
 
 #####
 
-# rover_dynamics to compute the derivative of the state vector
 def rover_dynamics(t, y, rover, planet, experiment):
+
+    """
+    Compute the time derivative of the rover state vector
+
+    Parameters
+    ----------
+    t: scalar
+        time (s)
+    y: numpy.ndarray
+         state vector containing velocity and distance
+    rover: dict
+        dictionary containing rover parameters
+    planet: dict
+        dictionary containing planetary parameters
+    experiment: dict
+        dictionary containing experiment parameters
+
+    Returns
+    -------
+    dydt: numpy.ndarray
     
     # Validate that t is a scalar
     if not np.isscalar(t):
         raise Exception("t must be a scalar")
     
     # Validate that y is a 1D numpy array
-    if y > 1:
+    if not isinstance(y, np.darray) or y.ndim != 1:
         raise Exception('Y must be a scalar or a 1D array.')
     
     # Validate that rover is a dictionary
@@ -376,11 +407,25 @@ def rover_dynamics(t, y, rover, planet, experiment):
 
 #####
 
-# Computes the instantaneous mechanical power output
 def mechpower(v, rover):
+
+    """
+    Computes the instantaneous mechanical power output
+
+    Parameters
+    ----------
+    v: scalar or numpy.ndarray
+        rover translational velocity
+    rover: dict
+        Dictionary containing rover parameters
+
+    Returns
+    -------
+    Power: scalar or numpy.ndarray
+        instantaneous mechanical power [W]
     
     # Validate that v is a scalar or a 1D numpy array
-    if v > 1:
+    if not (np.iscalar(v) or isinstance(v, np.ndarray) and v.ndim == 1):
         raise Exception('v must be a scalar or a 1D array.')
     
     # Validate that v contains numerical values
@@ -538,41 +583,4 @@ def simulate_rover(rover, planet, experiment, end_event):
 
     return rover
 
-####
-
-# given from Canvas
-def end_of_mission_event(end_event):
-    """
-    Defines an event that terminates the mission simulation. Mission is over
-    when rover reaches a certain distance, has moved for a maximum simulation 
-    time or has reached a minimum velocity.            
-    """
-    
-    mission_distance = end_event['max_distance']
-    mission_max_time = end_event['max_time']
-    mission_min_velocity = end_event['min_velocity']
-    
-    # Assume that y[1] is the distance traveled
-    distance_left = lambda t,y: mission_distance - y[1]
-    distance_left.terminal = True
-    
-    time_left = lambda t,y: mission_max_time - t
-    time_left.terminal = True
-    
-    velocity_threshold = lambda t,y: y[0] - mission_min_velocity;
-    velocity_threshold.terminal = True
-    velocity_threshold.direction = -1
-    
-    # terminal indicates whether any of the conditions can lead to the
-    # termination of the ODE solver. In this case all conditions can terminate
-    # the simulation independently.
-    
-    # direction indicates whether the direction along which the different
-    # conditions is reached matters or does not matter. In this case, only
-    # the direction in which the velocity treshold is arrived at matters
-    # (negative)
-    
-    events = [distance_left, time_left, velocity_threshold]
-    
-    return events
 
