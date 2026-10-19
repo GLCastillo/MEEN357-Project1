@@ -60,3 +60,30 @@ print('Maximum Velocity [m/s]:', telemetry['max_velocity'])
 print('Average Velocity [m/s]:', telemetry['average_velocity'])
 print('Battery Energy [J]:', telemetry['battery_energy'])
 print('Energy per Distance [J/m]:', telemetry['energy_per_distance'])
+
+
+# task 9
+
+# Battery capacity
+battery_capacity = 0.9072 * 10^6
+
+# energy required
+battery_energy = telemetry['battery_energy']
+
+# Calculate remaining battery energy
+remaining_energy = battery_capacity - battery_energy
+
+# Check if the rover completed the mission
+if telemetry['distance_traveled'] >= 1000 - 1 *10^(-6):
+    if battery_energy <= battery_capacity:
+        print("The rover can complete the mission with the battery pack.")
+    else:
+        print("The battery pack does not have enough energy.")
+else:
+    print("The rover did not complete the 1000 m mission.")
+
+# Display results
+print("Battery Capacity [J]:", battery_capacity)
+print("Battery Energy Required [J]:", battery_energy)
+print("Remaining Battery Energy [J]:", remaining_energy)
+
