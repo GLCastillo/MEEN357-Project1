@@ -6,7 +6,6 @@ import math
 from define_experiment import experiment1
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp, trapezoid
-from end_of_mission_event import end_of_mission_event
 
 # Define constants and dictionaries (given from appendix A and C)
 wheel = {
