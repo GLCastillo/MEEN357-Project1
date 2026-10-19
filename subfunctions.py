@@ -454,18 +454,20 @@ def mechpower(v, rover):
 
 # Computes the total electrical energy consumed by all six rover motors during a simulation
 def battenergy(t, v, rover):
-"""
-Computes the total electrical energy consumed by all six rover motors
-during a simulation, accounting for motor efficiency.
-
-Inputs:
-    t: 1D numpy array of time samples [s]
-    v: 1D numpy array of rover velocities [m/s]
-    rover: dictionary containing rover parameters
-
-Output:
-    E: scalar total battery energy consumed [J]
-"""
+    """
+    Computes the total electrical energy consumed by all six rover motors
+    during a simulation, accounting for motor efficiency.
+    
+    Parameters
+    ----------
+        t: 1D numpy array of time samples [s]
+        v: 1D numpy array of rover velocities [m/s]
+        rover: dictionary containing rover parameters
+    
+    Returns
+    ----------
+        E: scalar total battery energy consumed [J]
+    """
     if not isinstance(t, np.ndarray) or t.ndim != 1:
         raise Exception("t must be a 1D numpy array.")
 
@@ -532,18 +534,20 @@ Output:
 
 # Simulates the rover's trajectory and calculates its telemetry data
 def simulate_rover(rover, planet, experiment, end_event):
-"""
-Simulates the rover's trajectory and calculates its telemetry data.
-
-Inputs:
-    rover: dictionary containing rover parameters
-    planet: dictionary containing planetary parameters
-    experiment: dictionary containing simulation parameters
-    end_event: dictionary containing simulation stopping conditions
-
-Output:
-    rover: updated rover dictionary containing telemetry data
-"""
+    """
+    Simulates the rover's trajectory and calculates its telemetry data.
+    
+    Parameters
+    ----------
+        rover: dictionary containing rover parameters
+        planet: dictionary containing planetary parameters
+        experiment: dictionary containing simulation parameters
+        end_event: dictionary containing simulation stopping conditions
+    
+    Returns
+    ----------
+        rover: updated rover dictionary containing telemetry data
+    """
     # Validate dictionaries
     if not isinstance(rover, dict):
         raise Exception("rover must be a dictionary.")
