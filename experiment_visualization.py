@@ -1,5 +1,4 @@
 ### To plot motor torque vs. efficiency
-
 import numpy as np
 import matplotlib.pyplot as plt
 from define_experiment import experiment1
@@ -17,8 +16,17 @@ alpha_fun = interp1d(alpha_dist, alpha_deg, kind = 'cubic', fill_value='extrapol
 
 alpha_values = alpha_fun(values)
 
+# Plot original data points as stars
+plt.plot(alpha_dist, alpha_deg, '*', label='Known terrain data')
+
+# Plot cubic interpolation as a line
+plt.plot(values, alpha_values, '-', label='Cubic interpolation')
+
 plt.plot(alpha_dist, alpha_deg, label = 'original data')
 plt.plot(values, alpha_values, label ='cubic interpolation')
 plt.xlabel("Distance along path [m]")
 plt.ylabel("Terrain angle [degrees]")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
 plt.show()
